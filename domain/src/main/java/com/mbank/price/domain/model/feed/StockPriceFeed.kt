@@ -3,6 +3,6 @@ package com.mbank.price.domain.model.feed
 import com.mbank.price.domain.model.stock.Stock
 
 data class StockPriceFeed(
-    val stockList: List<Stock>,
-    val connectionStatus: FeedConnection
+    val stocks: List<Stock>,
+    val connectionStatus: Connection
 )

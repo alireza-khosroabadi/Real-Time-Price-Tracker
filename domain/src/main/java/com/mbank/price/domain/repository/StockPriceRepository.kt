@@ -1,5 +1,9 @@
 package com.mbank.price.domain.repository
 
-interface StockPriceRepository {
+import com.mbank.price.domain.model.feed.StockPriceFeed
+import com.mbank.price.model.appResult.AppResult
+import kotlinx.coroutines.flow.Flow
 
+interface StockPriceRepository {
+    fun observeStockPrices(): Flow<AppResult<StockPriceFeed>>
 }
