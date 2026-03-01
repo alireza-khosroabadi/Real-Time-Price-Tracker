@@ -1,7 +1,6 @@
 package com.mbank.price.domain.useCase.stock
 
 import com.mbank.price.domain.useCase.testConfig.fakeRepository.FakeStockPriceRepository
-import org.junit.Assert
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 
