@@ -21,6 +21,15 @@ class FakeStockPriceRepository : StockPriceRepository {
             )
         )
     )
+    val connectionStatus: Flow<AppResult<Connection>> = MutableStateFlow(
+        AppResult.Success(
+            Connection(
+                connectionStatus = ConnectionStatus.CONNECTED,
+                isRunning = true
+            )
+        )
+    )
 
     override fun observeStockPrices(): Flow<AppResult<StockPriceFeed>> = feedFlow
+    override fun observeConnectionStatus(): Flow<AppResult<Connection>> = connectionStatus
 }
