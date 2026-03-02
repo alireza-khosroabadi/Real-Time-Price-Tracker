@@ -8,5 +8,7 @@ dependencies {
     implementation(libs.javax.inject)
 
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.jupiter)
 }
 

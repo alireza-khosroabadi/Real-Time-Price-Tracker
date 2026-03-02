@@ -23,3 +23,4 @@ rootProject.name = "Real-Time Price Tracker App"
 include(":app")
 include(":domain")
 include(":core")
+include(":data")

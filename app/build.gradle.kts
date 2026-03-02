@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mbank.price"
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
