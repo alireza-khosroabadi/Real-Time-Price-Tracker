@@ -32,7 +32,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":common"))
+    implementation(project(":core:common"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
