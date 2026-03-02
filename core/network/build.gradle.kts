@@ -1,9 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.mbank.price.data"
+    namespace = "com.mbank.price.network"
     compileSdk {
         version = release(36)
     }
@@ -31,10 +33,14 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
     implementation(project(":core:common"))
+
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.okhttp)
+    implementation(libs.javax.inject)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }
