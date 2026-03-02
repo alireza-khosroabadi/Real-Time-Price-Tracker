@@ -1,4 +1,4 @@
-package com.mbank.price.model.connectionStatus
+package com.mbank.price.common.model.connectionStatus
 
 enum class ConnectionStatus {
     CONNECTING,

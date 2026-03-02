@@ -2,7 +2,7 @@ package com.mbank.price.domain.useCase.connection
 
 import com.mbank.price.domain.model.feed.Connection
 import com.mbank.price.domain.repository.StockPriceRepository
-import com.mbank.price.model.appResult.AppResult
+import com.mbank.price.common.model.appResult.AppResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
