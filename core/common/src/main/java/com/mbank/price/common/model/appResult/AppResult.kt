@@ -1,4 +1,4 @@
-package com.mbank.price.model.appResult
+package com.mbank.price.common.model.appResult
 
 sealed interface AppResult<out T> {
     data class Success<T>(val data: T) : AppResult<T>
