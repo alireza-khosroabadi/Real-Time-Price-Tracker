@@ -4,6 +4,7 @@ import com.mbank.price.common.model.appResult.AppResult
 import com.mbank.price.data.mapper.toDomainModel
 import com.mbank.price.data.model.priceUpdate.PriceStreamEvent
 import com.mbank.price.data.remote.RemoteDataSource
+import com.mbank.price.data.stockCatalog.StockCatalog
 import com.mbank.price.domain.model.feed.Connection
 import com.mbank.price.domain.model.feed.StockPriceFeed
 import com.mbank.price.domain.repository.StockPriceRepository
@@ -42,6 +43,19 @@ class StockPriceRepositoryImpl @Inject constructor(private val remoteDataSource:
         flow2 = remoteDataSource.observeWebSocketRunning()
     ){ connection, isRunning -> AppResult.Success(Connection(connectionStatus = connection, isRunning = isRunning)) }
 
+    override fun startFeed() {
+        remoteDataSource.start(
+            symbols = StockCatalog.symbols,
+        )
+    }
+
+    override fun stopFeed() {
+        remoteDataSource.stop()
+    }
+
+    override fun close() {
+        remoteDataSource.close()
+    }
 
 
 }

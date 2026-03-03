@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 
 interface RemoteDataSource {
-    fun start(symbols: List<String>, seedPrices: Map<String, BigDecimal>)
+    fun start(symbols: List<String>/*, seedPrices: Map<String, BigDecimal>*/)
     fun stop()
     fun close()
     fun observeStockPrices():Flow<PriceStreamEvent>

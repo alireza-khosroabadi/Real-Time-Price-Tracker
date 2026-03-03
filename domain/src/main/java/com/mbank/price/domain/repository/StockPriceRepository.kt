@@ -8,4 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface StockPriceRepository {
     fun observeStockPrices(): Flow<AppResult<StockPriceFeed>>
     fun observeConnectionStatus(): Flow<AppResult<Connection>>
+    fun startFeed()
+    fun stopFeed()
+    fun close()
 }
