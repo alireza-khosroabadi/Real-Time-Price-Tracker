@@ -5,6 +5,9 @@ import com.mbank.price.data.model.priceUpdate.PriceUpdateDto
 import com.mbank.price.common.model.annotation.ApplicationScope
 import com.mbank.price.common.model.appResult.AppError
 import com.mbank.price.common.model.connectionStatus.ConnectionStatus
+import com.mbank.price.data.model.price.PriceDto
+import com.mbank.price.data.model.stock.StockDto
+import com.mbank.price.data.stockCatalog.StockCatalog
 import com.mbank.price.network.webSocket.WebSocketFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -29,19 +33,20 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.random.Random
 
-class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebSocketFactory,
-                                              private val json: Json,
-                                              private val request: Request,
-                                              @param:ApplicationScope private val scope: CoroutineScope) :
+class OkHttpWebSocketDataSource @Inject constructor(private val webSocketFactory: WebSocketFactory,
+                                                    private val json: Json,
+                                                    private val request: Request,
+                                                    @param:ApplicationScope private val scope: CoroutineScope) :
     RemoteDataSource {
     private var webSocket: WebSocket? = null
     private val mutex = Mutex()
-    private var isRunning: AtomicBoolean = AtomicBoolean(false)
+    private val _isRunning = MutableStateFlow(false)
     private val _connectionStatus = MutableStateFlow(ConnectionStatus.DISCONNECTED)
     private var emitJob: Job? = null
     private var reconnectJob: Job? = null
     private val trackedSymbols = LinkedHashSet<String>()
     private val currentPrices = linkedMapOf<String, BigDecimal>()
+    private val priceUpdateSet = mutableSetOf<PriceUpdateDto>()
     private val _updates = MutableSharedFlow<PriceStreamEvent>(extraBufferCapacity = 256)
 
     override fun start(
@@ -56,25 +61,27 @@ class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebS
                 currentPrices.putAll(seedPrices)
             }
         }
-        isRunning.set(true)
+        _isRunning.update { true }
         connect()
         startEmissionLoop()
     }
 
     override fun stop() {
-        isRunning.set(false)
+        _isRunning.update { false }
         cancelAndClearEmitJob()
         closeSocket()
     }
 
     override fun close() {
-        isRunning.set(false)
+        _isRunning.update { false }
         cancelAndClearEmitJob()
         cancelAndClearReConnectJob()
         closeSocket()
     }
 
-    override fun observeSocket(): Flow<PriceStreamEvent> = _updates.conflate()
+    override fun observeStockPrices(): Flow<PriceStreamEvent> = _updates.conflate()
+    override fun observeWebSocketRunning(): Flow<Boolean> = _isRunning
+    override fun observeSocketStatus(): Flow<ConnectionStatus> = _connectionStatus
 
 
     private fun cancelAndClearEmitJob(){
@@ -88,7 +95,7 @@ class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebS
     }
 
     private fun connect(){
-        if (!isRunning.get()) return
+        if (!_isRunning.value) return
         _connectionStatus.value = ConnectionStatus.CONNECTING
        webSocket = webSocketFactory.create(request = request, listener = createListener())
     }
@@ -104,15 +111,15 @@ class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebS
             handleIncomingMessage(bytes.utf8())
         }
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            this@WebSocketDataSource.webSocket = null
+            this@OkHttpWebSocketDataSource.webSocket = null
             _connectionStatus.value = ConnectionStatus.DISCONNECTED
-            if (isRunning.get()) {
+            if (_isRunning.value) {
                 _updates.tryEmit(PriceStreamEvent.Error(AppError.Disconnected))
             }
             scheduleReconnect()
         }
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            this@WebSocketDataSource.webSocket = null
+            this@OkHttpWebSocketDataSource.webSocket = null
             _connectionStatus.value = ConnectionStatus.DISCONNECTED
             _updates.tryEmit(PriceStreamEvent.Error(AppError.Network))
             scheduleReconnect()
@@ -120,7 +127,7 @@ class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebS
     }
 
     private fun scheduleReconnect(){
-        if (!isRunning.get() && reconnectJob?.isActive == true) return
+        if (!_isRunning.value && reconnectJob?.isActive == true) return
 
         reconnectJob = scope.launch {
             delay(RECONNECT_DELAY_MS)
@@ -131,7 +138,7 @@ class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebS
     private fun startEmissionLoop(){
         if (emitJob?.isActive == true) return
         emitJob = scope.launch {
-            while (isActive && isRunning.get()){
+            while (isActive && _isRunning.value){
                 if (_connectionStatus.value == ConnectionStatus.CONNECTED){
                     emitPriceBatch()
                 }
@@ -148,8 +155,14 @@ class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebS
         }.forEach { (symbol, current) ->
             val next = generateNextPrice(current)
             val priceUpdate =PriceUpdateDto(
-                symbol = symbol,
-                price = next,
+                stockDto = StockDto(
+                    symbol = symbol,
+                    description = StockCatalog.descriptionFor(symbol)
+                ),
+                price = PriceDto(
+                    currentPrice = next,
+                    previousPrice = current,
+                ),
                 timestampMillis = System.currentTimeMillis()
             )
             webSocket?.send( json.encodeToString(priceUpdate))
@@ -164,10 +177,11 @@ class WebSocketDataSource @Inject constructor(private val webSocketFactory: WebS
         price?.let { data ->
             scope.launch {
                 mutex.withLock {
-                    if (!trackedSymbols.contains(data.symbol)) return@launch
-                    currentPrices[data.symbol] = data.price
+                    if (!trackedSymbols.contains(data.stockDto.symbol)) return@launch
+                    currentPrices[data.stockDto.symbol] = data.price.currentPrice
                 }
-                _updates.emit(PriceStreamEvent.Update(data))
+                priceUpdateSet.add(data)
+                _updates.emit(PriceStreamEvent.Update(priceUpdateSet))
             }
         }?:run {
             _updates.tryEmit(PriceStreamEvent.Error(AppError.Unknown("Failed to parse stream message")))
