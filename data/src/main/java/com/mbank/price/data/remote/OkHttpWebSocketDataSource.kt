@@ -51,14 +51,12 @@ class OkHttpWebSocketDataSource @Inject constructor(private val webSocketFactory
 
     override fun start(
         symbols: List<String>,
-//        seedPrices: Map<String, BigDecimal>
     ) {
         scope.launch {
             mutex.withLock {
                 trackedSymbols.clear()
                 trackedSymbols.addAll(symbols)
                 currentPrices.clear()
-//                currentPrices.putAll(seedPrices)
             }
         }
         _isRunning.update { true }
