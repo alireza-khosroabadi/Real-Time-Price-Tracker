@@ -11,6 +11,7 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
@@ -24,6 +25,11 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(): OkHttpClient =
         OkHttpClient.Builder().build()
+
+    @Provides
+    @Singleton
+    fun provideJson(): Json =
+        Json { ignoreUnknownKeys = true }
 
     @Provides
     @Singleton

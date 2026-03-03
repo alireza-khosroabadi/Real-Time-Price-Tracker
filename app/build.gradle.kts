@@ -40,9 +40,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
+//    implementation(project(":core:common"))
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":feature:stock-price"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

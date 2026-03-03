@@ -1,4 +1,4 @@
-package com.mbank.price.data.mapper
+package com.mbank.price.data.model.mapper
 
 import com.mbank.price.data.model.price.PriceDto
 import com.mbank.price.data.model.priceUpdate.PriceUpdateDto

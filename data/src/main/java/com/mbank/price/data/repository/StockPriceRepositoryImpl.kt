@@ -1,7 +1,7 @@
 package com.mbank.price.data.repository
 
 import com.mbank.price.common.model.appResult.AppResult
-import com.mbank.price.data.mapper.toDomainModel
+import com.mbank.price.data.model.mapper.toDomainModel
 import com.mbank.price.data.model.priceUpdate.PriceStreamEvent
 import com.mbank.price.data.remote.RemoteDataSource
 import com.mbank.price.data.stockCatalog.StockCatalog
