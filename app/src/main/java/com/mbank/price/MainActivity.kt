@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mbank.price.stockPrice.feed.ui.StockPricesFeedScreen
-import com.mbank.price.ui.theme.RealTimePriceTrackerAppTheme
+import com.mbank.price.ui.theme.PriceTrackerAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RealTimePriceTrackerAppTheme {
+            PriceTrackerAppTheme {
                 Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)){
                         StockPricesFeedScreen()
@@ -44,7 +44,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    RealTimePriceTrackerAppTheme {
+    PriceTrackerAppTheme {
         Greeting("Android")
     }
 }

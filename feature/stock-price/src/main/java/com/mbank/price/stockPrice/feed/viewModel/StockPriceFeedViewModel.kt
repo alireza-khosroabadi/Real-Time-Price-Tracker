@@ -67,4 +67,11 @@ class StockPriceFeedViewModel @Inject constructor(
 
     fun stop(){stopStreamStockPricesUseCase.invoke()}
 
+    fun toggleConnection(){
+        if (_uiState.value.isRunning){
+            stopStreamStockPricesUseCase.invoke()
+        }else{
+            startStreamStockPricesUseCase.invoke()
+        }
+    }
 }
