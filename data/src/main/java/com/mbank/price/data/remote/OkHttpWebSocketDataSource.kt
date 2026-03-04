@@ -46,7 +46,7 @@ class OkHttpWebSocketDataSource @Inject constructor(private val webSocketFactory
     private var reconnectJob: Job? = null
     private val trackedSymbols = LinkedHashSet<String>()
     private val currentPrices = linkedMapOf<String, BigDecimal>()
-    private val priceUpdateSet = mutableSetOf<PriceUpdateDto>()
+    private val priceUpdateSet = mutableMapOf<String, PriceUpdateDto>()
     private val _updates = MutableSharedFlow<PriceStreamEvent>(extraBufferCapacity = 256)
 
     override fun start(
@@ -195,7 +195,7 @@ class OkHttpWebSocketDataSource @Inject constructor(private val webSocketFactory
                     if (!trackedSymbols.contains(data.stockDto.symbol)) return@launch
                     currentPrices[data.stockDto.symbol] = data.price.currentPrice
                 }
-                priceUpdateSet.add(data)
+                priceUpdateSet[data.stockDto.symbol] = data
                 _updates.emit(PriceStreamEvent.Update(priceUpdateSet))
             }
         }?:run {

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.mbank.price.common.model.appResult.AppResult
 import com.mbank.price.domain.useCase.connection.ObserveConnectionStatusUseCase
 import com.mbank.price.domain.useCase.connection.StartStreamStockPricesUseCase
+import com.mbank.price.domain.useCase.connection.StopStreamStockPricesUseCase
 import com.mbank.price.domain.useCase.stock.ObserveStockPricesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class StockPriceFeedViewModel @Inject constructor(
     private val observeStockPricesUseCase: ObserveStockPricesUseCase,
-    startStreamStockPricesUseCase: StartStreamStockPricesUseCase,
+    private val startStreamStockPricesUseCase: StartStreamStockPricesUseCase,
+    private val stopStreamStockPricesUseCase: StopStreamStockPricesUseCase,
     private val observeConnectionStatusUseCase: ObserveConnectionStatusUseCase
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<StockPriceFeedUiState> = MutableStateFlow(StockPriceFeedUiState())
@@ -25,7 +27,7 @@ class StockPriceFeedViewModel @Inject constructor(
 
     init {
         observeStockPrices()
-        startStreamStockPricesUseCase.invoke()
+        observeConnectionStatus()
     }
 
     private fun observeStockPrices(){
@@ -44,4 +46,25 @@ class StockPriceFeedViewModel @Inject constructor(
             }
         }
     }
+
+    fun observeConnectionStatus(){
+        viewModelScope.launch {
+            observeConnectionStatusUseCase.invoke().collect { appResult ->
+                when(appResult){
+                    is AppResult.Error -> {}
+                    is AppResult.Success -> _uiState.update { old -> old.copy(
+                        connection = appResult.data.connectionStatus,
+                        isRunning = appResult.data.isRunning
+                    )}
+                }
+            }
+        }
+    }
+
+    fun start(){
+        startStreamStockPricesUseCase.invoke()
+    }
+
+    fun stop(){stopStreamStockPricesUseCase.invoke()}
+
 }

@@ -24,7 +24,7 @@ class StockPriceRepositoryImpl @Inject constructor(private val remoteDataSource:
             is PriceStreamEvent.Error -> AppResult.Error(stock.error)
             is PriceStreamEvent.Update -> AppResult.Success(
                 StockPriceFeed(
-                    stocks = stock.update
+                    stocks = stock.update.values
                         .sortedByDescending { it.price.currentPrice }
                         .map { it.toDomainModel() },
                     connectionStatus = Connection(
