@@ -64,6 +64,23 @@ class OkHttpWebSocketDataSource @Inject constructor(private val webSocketFactory
         startEmissionLoop()
     }
 
+    override fun start(
+        symbols: List<String>,
+        seedPrices: Map<String, BigDecimal>
+    ) {
+        scope.launch {
+            mutex.withLock {
+                trackedSymbols.clear()
+                trackedSymbols.addAll(symbols)
+                currentPrices.clear()
+                currentPrices.putAll(seedPrices)
+            }
+        }
+        _isRunning.update { true }
+        connect()
+        startEmissionLoop()
+    }
+
     override fun stop() {
         _isRunning.update { false }
         cancelAndClearEmitJob()
@@ -137,9 +154,9 @@ class OkHttpWebSocketDataSource @Inject constructor(private val webSocketFactory
         if (emitJob?.isActive == true) return
         emitJob = scope.launch {
             while (isActive && _isRunning.value){
-                if (_connectionStatus.value == ConnectionStatus.CONNECTED){
+//                if (_connectionStatus.value == ConnectionStatus.CONNECTED){
                     emitPriceBatch()
-                }
+//                }
                 delay(EMIT_INTERVAL_MS)
             }
         }

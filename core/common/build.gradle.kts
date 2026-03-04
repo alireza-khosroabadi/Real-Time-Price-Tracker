@@ -3,5 +3,6 @@ plugins {
 }
 
 dependencies{
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.javax.inject)
 }

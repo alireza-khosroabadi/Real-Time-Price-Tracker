@@ -44,8 +44,13 @@ class StockPriceRepositoryImpl @Inject constructor(private val remoteDataSource:
     ){ connection, isRunning -> AppResult.Success(Connection(connectionStatus = connection, isRunning = isRunning)) }
 
     override fun startFeed() {
+//        remoteDataSource.start(
+//            symbols = StockCatalog.symbols,
+//        )
+
         remoteDataSource.start(
             symbols = StockCatalog.symbols,
+            seedPrices = StockCatalog.initialQuotes().mapValues { it.value.price.currentPrice }
         )
     }
 

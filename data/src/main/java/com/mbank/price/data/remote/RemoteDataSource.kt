@@ -7,6 +7,7 @@ import java.math.BigDecimal
 
 interface RemoteDataSource {
     fun start(symbols: List<String>)
+    fun start(symbols: List<String>, seedPrices: Map<String, BigDecimal>)
     fun stop()
     fun close()
     fun observeStockPrices():Flow<PriceStreamEvent>
