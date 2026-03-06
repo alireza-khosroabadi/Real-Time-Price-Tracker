@@ -4,15 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.mbank.price.stockPrice.feed.ui.StockPricesFeedScreen
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import com.mbank.price.navigation.StockDetail
+import com.mbank.price.navigation.StockPriceFeed
+import com.mbank.price.stockPrice.stockDetail.StockDetailScreen
+import com.mbank.price.stockPrice.stockPricesFeed.ui.StockPricesFeedScreen
 import com.mbank.price.ui.theme.PriceTrackerAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,13 +26,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PriceTrackerAppTheme {
-                Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)){
-                        StockPricesFeedScreen()
+            val backStack = rememberNavBackStack(StockPriceFeed)
+            NavDisplay(
+                backStack = backStack,
+                onBack = { backStack.removeLastOrNull() },
+                entryDecorators = listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator()
+                ),
+                entryProvider = entryProvider {
+                    entry<StockPriceFeed> {
+                        StockPricesFeedScreen {
+                            backStack.add(StockDetail(it))
+                        }
+                    }
+                    entry<StockDetail> { key ->
+                        StockDetailScreen(key.symbol)
                     }
                 }
-            }
+            )
         }
     }
 }

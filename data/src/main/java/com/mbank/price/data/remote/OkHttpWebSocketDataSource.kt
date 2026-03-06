@@ -1,11 +1,11 @@
 package com.mbank.price.data.remote
 
-import com.mbank.price.data.model.priceUpdate.PriceStreamEvent
-import com.mbank.price.data.model.priceUpdate.PriceUpdateDto
 import com.mbank.price.common.model.annotation.ApplicationScope
 import com.mbank.price.common.model.appResult.AppError
 import com.mbank.price.common.model.connectionStatus.ConnectionStatus
 import com.mbank.price.data.model.price.PriceDto
+import com.mbank.price.data.model.priceUpdate.PriceStreamEvent
+import com.mbank.price.data.model.priceUpdate.PriceUpdateDto
 import com.mbank.price.data.model.stock.StockDto
 import com.mbank.price.data.stockCatalog.StockCatalog
 import com.mbank.price.network.webSocket.WebSocketFactory
@@ -29,7 +29,6 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -154,9 +153,9 @@ class OkHttpWebSocketDataSource @Inject constructor(private val webSocketFactory
         if (emitJob?.isActive == true) return
         emitJob = scope.launch {
             while (isActive && _isRunning.value){
-//                if (_connectionStatus.value == ConnectionStatus.CONNECTED){
+                if (_connectionStatus.value == ConnectionStatus.CONNECTED){
                     emitPriceBatch()
-//                }
+                }
                 delay(EMIT_INTERVAL_MS)
             }
         }

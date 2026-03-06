@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="connectionStatus_connecting">connecting</string>
+    <string name="connectionStatus_connected">connected</string>
+    <string name="connectionStatus_disconnected">disconnected</string>
+</resources>
