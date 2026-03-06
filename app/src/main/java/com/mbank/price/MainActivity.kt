@@ -27,24 +27,28 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val backStack = rememberNavBackStack(StockPriceFeed)
-            NavDisplay(
-                backStack = backStack,
-                onBack = { backStack.removeLastOrNull() },
-                entryDecorators = listOf(
-                    rememberSaveableStateHolderNavEntryDecorator(),
-                    rememberViewModelStoreNavEntryDecorator()
-                ),
-                entryProvider = entryProvider {
-                    entry<StockPriceFeed> {
-                        StockPricesFeedScreen {
-                            backStack.add(StockDetail(it))
+            PriceTrackerAppTheme {
+                NavDisplay(
+                    backStack = backStack,
+                    onBack = { backStack.removeLastOrNull() },
+                    entryDecorators = listOf(
+                        rememberSaveableStateHolderNavEntryDecorator(),
+                        rememberViewModelStoreNavEntryDecorator()
+                    ),
+                    entryProvider = entryProvider {
+                        entry<StockPriceFeed> {
+                            StockPricesFeedScreen {
+                                backStack.add(StockDetail(it))
+                            }
+                        }
+                        entry<StockDetail> { key ->
+                            StockDetailScreen(key.symbol) {
+                                backStack.removeLastOrNull()
+                            }
                         }
                     }
-                    entry<StockDetail> { key ->
-                        StockDetailScreen(key.symbol)
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }

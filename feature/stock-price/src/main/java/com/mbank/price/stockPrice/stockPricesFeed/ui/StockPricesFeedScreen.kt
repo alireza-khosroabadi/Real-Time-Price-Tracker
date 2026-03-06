@@ -145,6 +145,7 @@ fun LazyListScope.loading(connectionStatus: ConnectionStatus) {
 }
 
 fun LazyListScope.stockList(stocks: List<Stock>, onItemClick: (symbol: String) -> Unit) {
+    item { Spacer(modifier = Modifier.height(8.dp)) }
     items(items = stocks, key = { it.symbol }) { stock ->
         StockRow(
             stock = stock,

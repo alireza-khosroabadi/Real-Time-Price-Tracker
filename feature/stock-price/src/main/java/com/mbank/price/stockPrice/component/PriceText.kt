@@ -10,6 +10,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mbank.price.domain.model.price.PriceStatus
 import com.mbank.price.domain.model.price.StockPrice
@@ -56,6 +57,30 @@ fun PriceText(
         color = color,
         modifier = modifier
             .background(if (isFlashing) flashColor.copy(alpha = 0.1f) else Color.Transparent)
+            .clip(shape = MaterialTheme.shapes.small)
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    )
+}
+
+
+@Composable
+fun PercentageText(
+    price: StockPrice,
+    modifier: Modifier = Modifier
+) {
+    val localColor = LocalStockPriceExtraColors.current
+
+    val color = when (price.priceStatus) {
+        PriceStatus.UP -> localColor.priceUp
+        PriceStatus.DOWN -> localColor.priceDown
+        PriceStatus.NO_CHANGE -> localColor.priceNeutral
+    }
+
+    Text(
+        text = String.format(Locale.US, "%.2f", price.changePercentage),
+        color = color,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
             .clip(shape = MaterialTheme.shapes.small)
             .padding(horizontal = 6.dp, vertical = 2.dp)
     )

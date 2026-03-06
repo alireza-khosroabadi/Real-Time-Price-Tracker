@@ -3,4 +3,5 @@
     <string name="connectionStatus_connecting">connecting</string>
     <string name="connectionStatus_connected">connected</string>
     <string name="connectionStatus_disconnected">disconnected</string>
+    <string name="stockDetailScreen_about">About</string>
 </resources>
