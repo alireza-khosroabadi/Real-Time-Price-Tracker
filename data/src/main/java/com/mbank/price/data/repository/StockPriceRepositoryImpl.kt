@@ -3,7 +3,8 @@ package com.mbank.price.data.repository
 import com.mbank.price.common.model.annotation.ApplicationScope
 import com.mbank.price.common.model.appResult.AppError
 import com.mbank.price.common.model.appResult.AppResult
-import com.mbank.price.common.model.appResult.AppResult.*
+import com.mbank.price.common.model.appResult.AppResult.Error
+import com.mbank.price.common.model.appResult.AppResult.Success
 import com.mbank.price.common.model.connectionStatus.ConnectionStatus
 import com.mbank.price.data.model.mapper.toDomainModel
 import com.mbank.price.data.model.priceUpdate.PriceStreamEvent
@@ -19,12 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
