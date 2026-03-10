@@ -4,4 +4,6 @@
     <string name="connectionStatus_connected">connected</string>
     <string name="connectionStatus_disconnected">disconnected</string>
     <string name="stockDetailScreen_about">About</string>
+    <string name="stockPricesFeedScreen_connection_stop">Stop</string>
+    <string name="stockPricesFeedScreen_connection_start">Start</string>
 </resources>

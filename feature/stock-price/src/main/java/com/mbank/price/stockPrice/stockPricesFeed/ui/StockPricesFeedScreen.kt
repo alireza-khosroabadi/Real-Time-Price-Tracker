@@ -41,6 +41,7 @@ import com.mbank.price.stockPrice.R
 import com.mbank.price.stockPrice.component.PriceText
 import com.mbank.price.stockPrice.stockPricesFeed.viewModel.StockPriceFeedUiState
 import com.mbank.price.stockPrice.stockPricesFeed.viewModel.StockPriceFeedViewModel
+import com.mbank.price.ui.component.ErrorScreen
 import com.mbank.price.ui.theme.LocalStockPriceExtraColors
 
 @Composable
@@ -63,13 +64,15 @@ fun StockPricesFeedScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        LazyColumn(modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxSize()
-            .padding(padding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxSize()
+                .padding(padding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             when (val state = feedUiState) {
-                is StockPriceFeedUiState.Failed -> {}
+                is StockPriceFeedUiState.Failed -> item { ErrorScreen(state.error){viewModel.start()} }
                 StockPriceFeedUiState.Loading -> loading(connectionUiState.connection)
                 is StockPriceFeedUiState.Success -> stockList(
                     stocks = state.stocks,
@@ -109,7 +112,12 @@ fun FeedTopBar(
         },
         actions = {
             TextButton(onClick = onToggleFeed) {
-                Text(if (isFeedRunning) "Stop" else "Start")
+                Text(
+                    if (isFeedRunning) stringResource(R.string.stockPricesFeedScreen_connection_stop) else stringResource(
+                        R.string.stockPricesFeedScreen_connection_start
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

@@ -69,7 +69,7 @@ class StockPriceFeedViewModel @Inject constructor(
         }
     }
 
-    private fun start() {
+    fun start() {
         startStreamStockPricesUseCase.invoke()
     }
 

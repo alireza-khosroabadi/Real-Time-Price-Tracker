@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,9 @@ import com.mbank.price.stockPrice.R
 import com.mbank.price.stockPrice.component.PercentageText
 import com.mbank.price.stockPrice.component.PriceText
 import com.mbank.price.stockPrice.stockDetail.viewModel.StockDetailViewModel
+import com.mbank.price.ui.component.ErrorBanner
+import com.mbank.price.ui.component.ErrorScreen
+import com.mbank.price.ui.component.toMessage
 
 const val SCREEN_ROUTE_SYMBOL_PARAM = "symbol"
 
@@ -43,6 +47,7 @@ const val SCREEN_ROUTE_SYMBOL_PARAM = "symbol"
 @Composable
 fun StockDetailScreen(symbol: String, viewModel: StockDetailViewModel = hiltViewModel(), onBackClick: ()->Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(symbol) {
         viewModel.observeSymbol(symbol)
@@ -65,7 +70,7 @@ fun StockDetailScreen(symbol: String, viewModel: StockDetailViewModel = hiltView
     ) { padding ->
 
         when {
-            uiState.error != null -> {}
+            uiState.error != null -> uiState.error?.let { ErrorScreen(it) }
             uiState.stock != null -> Column(
                 modifier = Modifier
                     .padding(padding)
@@ -84,6 +89,8 @@ fun StockDetailScreen(symbol: String, viewModel: StockDetailViewModel = hiltView
         }
     }
 }
+
+
 
 @Composable
 fun PriceCard(stock: Stock) {
