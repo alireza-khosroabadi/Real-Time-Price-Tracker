@@ -8,15 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
-import com.mbank.price.navigation.StockDetail
-import com.mbank.price.navigation.StockPriceFeed
-import com.mbank.price.stockPrice.stockDetail.StockDetailScreen
-import com.mbank.price.stockPrice.stockPricesFeed.ui.StockPricesFeedScreen
+import com.mbank.price.navigation.AppNavHost
 import com.mbank.price.ui.theme.PriceTrackerAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,28 +18,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val backStack = rememberNavBackStack(StockPriceFeed)
             PriceTrackerAppTheme {
-                NavDisplay(
-                    backStack = backStack,
-                    onBack = { backStack.removeLastOrNull() },
-                    entryDecorators = listOf(
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator()
-                    ),
-                    entryProvider = entryProvider {
-                        entry<StockPriceFeed> {
-                            StockPricesFeedScreen {
-                                backStack.add(StockDetail(it))
-                            }
-                        }
-                        entry<StockDetail> { key ->
-                            StockDetailScreen(key.symbol) {
-                                backStack.removeLastOrNull()
-                            }
-                        }
-                    }
-                )
+                AppNavHost()
             }
         }
     }

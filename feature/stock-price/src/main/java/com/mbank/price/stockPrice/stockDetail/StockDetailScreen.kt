@@ -37,21 +37,16 @@ import com.mbank.price.stockPrice.R
 import com.mbank.price.stockPrice.component.PercentageText
 import com.mbank.price.stockPrice.component.PriceText
 import com.mbank.price.stockPrice.stockDetail.viewModel.StockDetailViewModel
-import com.mbank.price.ui.component.ErrorBanner
 import com.mbank.price.ui.component.ErrorScreen
-import com.mbank.price.ui.component.toMessage
 
 const val SCREEN_ROUTE_SYMBOL_PARAM = "symbol"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StockDetailScreen(symbol: String, viewModel: StockDetailViewModel = hiltViewModel(), onBackClick: ()->Unit) {
+fun StockDetailScreen(viewModel: StockDetailViewModel = hiltViewModel(), onBackClick: ()->Unit) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
-    LaunchedEffect(symbol) {
-        viewModel.observeSymbol(symbol)
-    }
+    LaunchedEffect(Unit) { viewModel.observeSymbol()}
 
     Scaffold(
         topBar = {

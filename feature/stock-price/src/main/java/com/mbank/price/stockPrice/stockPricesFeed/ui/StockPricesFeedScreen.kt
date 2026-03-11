@@ -54,13 +54,11 @@ fun StockPricesFeedScreen(
 
     Scaffold(
         topBar = {
-            if (feedUiState !is StockPriceFeedUiState.Loading) {
                 FeedTopBar(
                     connectionStatus = connectionUiState.connection,
                     isFeedRunning = connectionUiState.isRunning,
                     onToggleFeed = viewModel::toggleConnection
                 )
-            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->

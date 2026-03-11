@@ -1,5 +1,6 @@
 package com.mbank.price.stockPrice.stockDetail.viewModel
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.mbank.price.common.model.appResult.AppError
 import com.mbank.price.common.model.appResult.AppResult
@@ -9,6 +10,7 @@ import com.mbank.price.domain.model.stock.Stock
 import com.mbank.price.domain.param.StockParam
 import com.mbank.price.domain.useCase.stock.ObserveStockDetailsUseCase
 import com.mbank.price.stockPrice.config.MainDispatcherRule
+import com.mbank.price.stockPrice.stockDetail.SCREEN_ROUTE_SYMBOL_PARAM
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -28,6 +30,9 @@ class StockDetailViewModelTest {
     @Test
     fun `observeSymbol success updates uiState`() = runTest {
         val useCase: ObserveStockDetailsUseCase = mock()
+        val savedStateHandle = SavedStateHandle(
+            mapOf(SCREEN_ROUTE_SYMBOL_PARAM to "AAPL")
+        )
 
         val stock = Stock(
             symbol = "AAPL",
@@ -43,12 +48,16 @@ class StockDetailViewModelTest {
         whenever(useCase.invoke(StockParam("AAPL")))
             .thenReturn(flowOf(AppResult.Success(stock)))
 
-        val viewModel = StockDetailViewModel(useCase)
+        val viewModel = StockDetailViewModel(
+            savedStateHandle = savedStateHandle,
+            observeStockDetailsUseCase = useCase
+        )
 
         viewModel.uiState.test {
+
             assertEquals(StockDetailUiState(), awaitItem())
 
-            viewModel.observeSymbol("AAPL")
+            viewModel.observeSymbol()
 
             assertEquals(
                 StockDetailUiState(stock = stock, error = null),
@@ -62,15 +71,23 @@ class StockDetailViewModelTest {
     @Test
     fun `observeSymbol error updates uiState`() = runTest {
         val useCase: ObserveStockDetailsUseCase = mock()
+        val savedStateHandle = SavedStateHandle(
+            mapOf(SCREEN_ROUTE_SYMBOL_PARAM to "AAPL")
+        )
 
         whenever(useCase.invoke(StockParam("AAPL")))
             .thenReturn(flowOf(AppResult.Error(AppError.Network)))
 
-        val viewModel = StockDetailViewModel(useCase)
+        val viewModel = StockDetailViewModel(
+            savedStateHandle = savedStateHandle,
+            observeStockDetailsUseCase = useCase
+        )
 
         viewModel.uiState.test {
             assertEquals(StockDetailUiState(), awaitItem())
-            viewModel.observeSymbol("AAPL")
+
+            viewModel.observeSymbol()
+
             assertEquals(
                 StockDetailUiState(stock = null, error = AppError.Network),
                 awaitItem()

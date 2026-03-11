@@ -1,10 +1,12 @@
 package com.mbank.price.stockPrice.stockDetail.viewModel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mbank.price.common.model.appResult.AppResult
 import com.mbank.price.domain.param.StockParam
 import com.mbank.price.domain.useCase.stock.ObserveStockDetailsUseCase
+import com.mbank.price.stockPrice.stockDetail.SCREEN_ROUTE_SYMBOL_PARAM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,17 +15,21 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class StockDetailViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val observeStockDetailsUseCase: ObserveStockDetailsUseCase
 ) : ViewModel() {
 
+    val routeParam = savedStateHandle.get<String?>(SCREEN_ROUTE_SYMBOL_PARAM)
     private val _uiState: MutableStateFlow<StockDetailUiState> = MutableStateFlow(StockDetailUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun observeSymbol(symbol: String) {
+    fun observeSymbol() {
         viewModelScope.launch {
-            observeStockDetailsUseCase.invoke(
-                StockParam(symbol)
-            ).collect {
+            routeParam?.let {
+                observeStockDetailsUseCase.invoke(
+                    StockParam(it)
+                )
+            }?.collect {
               val state =   when (it) {
                     is AppResult.Error -> StockDetailUiState(error = it.error)
                     is AppResult.Success -> StockDetailUiState(stock = it.data)
